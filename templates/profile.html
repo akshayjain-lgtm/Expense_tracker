@@ -2,6 +2,10 @@
 
 {% block title %}Profile — Spendly{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="profile-layout">
 
@@ -17,6 +21,34 @@
         Member since {{ user.member_since }}
       </p>
     </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-presets">
+      <a href="{{ url_for('profile') }}"
+         class="filter-preset{% if active_preset == 'all_time' %} filter-preset--active{% endif %}">
+        All Time
+      </a>
+      <a href="{{ url_for('profile', date_from=presets.this_month.date_from, date_to=presets.this_month.date_to) }}"
+         class="filter-preset{% if active_preset == 'this_month' %} filter-preset--active{% endif %}">
+        This Month
+      </a>
+      <a href="{{ url_for('profile', date_from=presets.last_3.date_from, date_to=presets.last_3.date_to) }}"
+         class="filter-preset{% if active_preset == 'last_3' %} filter-preset--active{% endif %}">
+        Last 3 Months
+      </a>
+      <a href="{{ url_for('profile', date_from=presets.last_6.date_from, date_to=presets.last_6.date_to) }}"
+         class="filter-preset{% if active_preset == 'last_6' %} filter-preset--active{% endif %}">
+        Last 6 Months
+      </a>
+    </div>
+    <form class="filter-custom" method="GET" action="{{ url_for('profile') }}">
+      <input class="form-input" type="date" name="date_from" value="{{ date_from or '' }}">
+      <span class="filter-sep">to</span>
+      <input class="form-input" type="date" name="date_to" value="{{ date_to or '' }}">
+      <button class="btn-ghost" type="submit">Apply</button>
+    </form>
   </div>
 
   <!-- Stats row -->
@@ -51,6 +83,9 @@
         </tr>
       </thead>
       <tbody>
+        {% if not expenses %}
+        <tr><td colspan="4" class="table-empty">No transactions match your filter.</td></tr>
+        {% endif %}
         {% for expense in expenses %}
         <tr>
           <td class="date-col">{{ expense.date }}</td>
