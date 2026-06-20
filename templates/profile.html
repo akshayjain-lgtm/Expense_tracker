@@ -83,11 +83,12 @@
           <th>Description</th>
           <th>Category</th>
           <th class="amount-col">Amount</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
         {% if not expenses %}
-        <tr><td colspan="4" class="table-empty">No transactions match your filter.</td></tr>
+        <tr><td colspan="5" class="table-empty">No transactions match your filter.</td></tr>
         {% endif %}
         {% for expense in expenses %}
         <tr>
@@ -95,6 +96,17 @@
           <td>{{ expense.description }}</td>
           <td><span class="badge badge--{{ expense.category|lower }}">{{ expense.category }}</span></td>
           <td class="amount-col">₹{{ "{:.2f}".format(expense.amount) }}</td>
+          <td class="actions-col">
+            <a href="{{ url_for('edit_expense', id=expense.id) }}" class="btn-edit">Edit</a>
+            <form method="POST" action="{{ url_for('delete_expense', id=expense.id) }}"
+                  style="display:inline" onsubmit="return confirm('Delete this expense?')">
+              {% if date_from and date_to %}
+              <input type="hidden" name="date_from" value="{{ date_from }}">
+              <input type="hidden" name="date_to" value="{{ date_to }}">
+              {% endif %}
+              <button type="submit" class="btn-delete">Delete</button>
+            </form>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
