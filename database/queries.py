@@ -63,12 +63,30 @@ def get_recent_transactions(user_id, limit=10, date_from=None, date_to=None):
         clause = ""
     db = get_db()
     rows = db.execute(
-        "SELECT date, description, category, amount "
+        "SELECT id, date, description, category, amount "
         "FROM expenses WHERE user_id = ?" + clause + " ORDER BY date DESC LIMIT ?",
         params,
     ).fetchall()
     db.close()
     return [dict(r) for r in rows]
+
+
+def get_expense_by_id(expense_id, user_id):
+    db = get_db()
+    row = db.execute(
+        "SELECT * FROM expenses WHERE id = ? AND user_id = ?", (expense_id, user_id)
+    ).fetchone()
+    db.close()
+    return row
+
+
+def delete_expense(expense_id, user_id):
+    db = get_db()
+    db.execute(
+        "DELETE FROM expenses WHERE id = ? AND user_id = ?", (expense_id, user_id)
+    )
+    db.commit()
+    db.close()
 
 
 def get_category_breakdown(user_id, date_from=None, date_to=None):

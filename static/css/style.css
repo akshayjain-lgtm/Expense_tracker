@@ -877,6 +877,39 @@ a { color: inherit; text-decoration: none; }
     font-size: 0.85rem;
 }
 
+.expense-table .actions-col {
+    white-space: nowrap;
+    text-align: right;
+}
+
+.expense-table .actions-col a,
+.expense-table .actions-col button {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    text-decoration: none;
+}
+
+.btn-edit {
+    color: var(--ink-soft);
+}
+
+.btn-edit:hover {
+    color: var(--ink);
+}
+
+.btn-delete {
+    color: var(--danger);
+}
+
+.btn-delete:hover {
+    text-decoration: underline;
+}
+
 /* Category badges */
 
 .badge {
