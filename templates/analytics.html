@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics — Spendly{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            Analytics · Coming soon
+        </div>
+        <h1 class="hero-title">
+            Your expenses,<br>
+            <span class="hero-title-accent">finally legible.</span>
+        </h1>
+        <p class="hero-subtitle">
+            Deep analytics for every rupee you spend — category breakdowns,
+            trend forecasting, and real-time alerts, all in one place.
+        </p>
+
+        <div class="countdown" id="countdown" data-launch="{{ launch_date }}">
+            <div class="countdown-unit">
+                <span class="countdown-value" data-unit="days">00</span>
+                <span class="countdown-label">Days</span>
+            </div>
+            <span class="countdown-sep">:</span>
+            <div class="countdown-unit">
+                <span class="countdown-value" data-unit="hours">00</span>
+                <span class="countdown-label">Hours</span>
+            </div>
+            <span class="countdown-sep">:</span>
+            <div class="countdown-unit">
+                <span class="countdown-value" data-unit="minutes">00</span>
+                <span class="countdown-label">Mins</span>
+            </div>
+            <span class="countdown-sep">:</span>
+            <div class="countdown-unit">
+                <span class="countdown-value" data-unit="seconds">00</span>
+                <span class="countdown-label">Secs</span>
+            </div>
+        </div>
+
+        <div class="notify-capture">
+            <form class="notify-form" id="notify-form">
+                <input type="email" id="notify-email" class="form-input" placeholder="your@email.com" required>
+                <button type="submit" class="btn-primary">Notify me</button>
+            </form>
+            <div class="notify-success" id="notify-success" hidden>
+                <span class="notify-success-dot"></span>
+                You're on the early access list.
+            </div>
+            <p class="notify-note">Early access only — no spam, unsubscribe anytime.</p>
+        </div>
+    </div>
+</section>
+
+<section class="analytics-preview-section">
+    <div class="mock-browser mock-browser--lg">
+        <div class="mock-browser-bar">
+            <span class="mock-dot mock-dot-red"></span>
+            <span class="mock-dot mock-dot-yellow"></span>
+            <span class="mock-dot mock-dot-green-mac"></span>
+            <span class="mock-browser-url">spendly.app/analytics</span>
+        </div>
+        <div class="mock-dashboard-grid">
+            <div class="dashboard-chart-card">
+                <div class="dashboard-chart-head">
+                    <div>
+                        <span class="dashboard-card-label">Total spend</span>
+                        <span class="dashboard-chart-value">₹54,200</span>
+                        <span class="dashboard-chart-trend dashboard-trend-up">▲ +12.4% vs last quarter</span>
+                    </div>
+                    <div class="dashboard-range-toggle">
+                        <span>1M</span><span>3M</span><span class="is-active">6M</span><span>YTD</span>
+                    </div>
+                </div>
+                <div class="mock-chart-bars">
+                    {% for month in [
+                        ('Jan', 42), ('Feb', 58), ('Mar', 39), ('Apr', 71),
+                        ('May', 64), ('Jun', 89), ('Jul', 76), ('Aug', 98)
+                    ] %}
+                    <div class="mock-chart-bar-col">
+                        <div class="mock-chart-bar-track">
+                            <div class="mock-chart-bar mock-bar-accent" style="height: {{ month[1] }}%"></div>
+                        </div>
+                        <span class="mock-chart-bar-label">{{ month[0] }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="dashboard-side-col">
+                <div class="dashboard-category-card">
+                    <span class="dashboard-card-label">By category</span>
+                    <div class="category-breakdown">
+                        {% for cat in [
+                            ('Marketing', '₹4,100', 82), ('Travel', '₹3,200', 64), ('Software', '₹2,600', 52)
+                        ] %}
+                        <div class="category-row">
+                            <div class="category-meta">
+                                <span class="category-name">{{ cat[0] }}</span>
+                                <span class="category-amount">{{ cat[1] }}</span>
+                            </div>
+                            <div class="progress-bar" style="--pct: {{ cat[2] }}%">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="dashboard-stat-chips">
+                    <div class="mock-stat-card">
+                        <span class="mock-stat-label">Receipts</span>
+                        <span class="mock-stat-value">1,284</span>
+                        <span class="mock-stat-sub mock-sub-success">+8%</span>
+                    </div>
+                    <div class="mock-stat-card">
+                        <span class="mock-stat-label">Avg txn</span>
+                        <span class="mock-stat-value">₹42.20</span>
+                        <span class="mock-stat-sub mock-sub-danger">-3%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="features-inner analytics-features-inner">
+        <div class="feature-card">
+            <div class="feature-icon">↗</div>
+            <h3 class="feature-title">Spend trends</h3>
+            <p class="feature-body">Time-series charts across every category with anomaly detection and forecasting.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">◐</div>
+            <h3 class="feature-title">Category breakdown</h3>
+            <p class="feature-body">Drill into any budget line. Actuals vs. budgets with variance highlights.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3 class="feature-title">Real-time feed</h3>
+            <p class="feature-body">Live expense stream with merchant enrichment and automatic receipt parsing.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">▤</div>
+            <h3 class="feature-title">Team reports</h3>
+            <p class="feature-body">Per-member summaries, approval workflows, and exportable PDF &amp; CSV.</p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    var countdownEl = document.getElementById('countdown');
+    var launchDate  = new Date(countdownEl.dataset.launch);
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function tick() {
+        var diff = Math.max(0, launchDate.getTime() - Date.now());
+        countdownEl.querySelector('[data-unit="days"]').textContent    = pad(Math.floor(diff / 86400000));
+        countdownEl.querySelector('[data-unit="hours"]').textContent   = pad(Math.floor((diff % 86400000) / 3600000));
+        countdownEl.querySelector('[data-unit="minutes"]').textContent = pad(Math.floor((diff % 3600000) / 60000));
+        countdownEl.querySelector('[data-unit="seconds"]').textContent = pad(Math.floor((diff % 60000) / 1000));
+    }
+
+    tick();
+    setInterval(tick, 1000);
+
+    var form    = document.getElementById('notify-form');
+    var success = document.getElementById('notify-success');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        form.hidden = true;
+        success.hidden = false;
+    });
+}());
+</script>
+{% endblock %}
