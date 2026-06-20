@@ -1,0 +1,67 @@
+/* ------------------------------------------------------------------ */
+/* Filter bar                                                          */
+/* ------------------------------------------------------------------ */
+
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+}
+
+.filter-presets {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-preset {
+    padding: 0.35rem 0.9rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.filter-preset:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.filter-preset--active {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.filter-custom {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-custom .form-input {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.85rem;
+    width: auto;
+}
+
+.filter-sep {
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+}
+
+.table-empty {
+    text-align: center;
+    color: var(--ink-muted);
+    padding: 2rem 0;
+    font-style: italic;
+}
