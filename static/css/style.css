@@ -825,6 +825,18 @@ a { color: inherit; text-decoration: none; }
     margin-bottom: 1.25rem;
 }
 
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.section-header .section-title {
+    margin-bottom: 0;
+}
+
 .expense-table {
     width: 100%;
     border-collapse: collapse;

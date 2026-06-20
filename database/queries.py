@@ -5,6 +5,17 @@ from database.db import get_db
 _DATE_CLAUSE = " AND date BETWEEN ? AND ?"
 
 
+def insert_expense(user_id, amount, category, date, description):
+    db = get_db()
+    db.execute(
+        "INSERT INTO expenses (user_id, amount, category, date, description) "
+        "VALUES (?, ?, ?, ?, ?)",
+        (user_id, amount, category, date, description),
+    )
+    db.commit()
+    db.close()
+
+
 def get_user_by_id(user_id):
     db = get_db()
     row = db.execute(
