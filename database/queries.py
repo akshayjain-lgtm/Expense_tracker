@@ -24,7 +24,9 @@ def get_user_by_id(user_id):
     db.close()
     if row is None:
         return None
-    member_since = datetime.strptime(row["created_at"][:10], "%Y-%m-%d").strftime("%B %Y")
+    member_since = datetime.strptime(row["created_at"][:10], "%Y-%m-%d").strftime(
+        "%B %Y"
+    )
     return {"name": row["name"], "email": row["email"], "member_since": member_since}
 
 
@@ -89,6 +91,17 @@ def delete_expense(expense_id, user_id):
     db.close()
 
 
+def update_expense(expense_id, user_id, amount, category, date, description):
+    db = get_db()
+    db.execute(
+        "UPDATE expenses SET amount = ?, category = ?, date = ?, description = ? "
+        "WHERE id = ? AND user_id = ?",
+        (amount, category, date, description, expense_id, user_id),
+    )
+    db.commit()
+    db.close()
+
+
 def get_category_breakdown(user_id, date_from=None, date_to=None):
     if date_from and date_to:
         params = (user_id, date_from, date_to)
@@ -99,7 +112,9 @@ def get_category_breakdown(user_id, date_from=None, date_to=None):
     db = get_db()
     rows = db.execute(
         "SELECT category AS name, SUM(amount) AS total "
-        "FROM expenses WHERE user_id = ?" + clause + " GROUP BY category ORDER BY total DESC",
+        "FROM expenses WHERE user_id = ?"
+        + clause
+        + " GROUP BY category ORDER BY total DESC",
         params,
     ).fetchall()
     db.close()
@@ -107,7 +122,11 @@ def get_category_breakdown(user_id, date_from=None, date_to=None):
         return []
     grand_total = sum(r["total"] for r in rows)
     result = [
-        {"name": r["name"], "total": r["total"], "pct": int(r["total"] * 100 / grand_total)}
+        {
+            "name": r["name"],
+            "total": r["total"],
+            "pct": int(r["total"] * 100 / grand_total),
+        }
         for r in rows
     ]
     diff = 100 - sum(c["pct"] for c in result)

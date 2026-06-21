@@ -1,18 +1,42 @@
 import sqlite3
 from datetime import date, datetime, timedelta
 
-from flask import Flask, abort, flash, render_template, redirect, request, session, url_for
+from flask import (
+    Flask,
+    abort,
+    flash,
+    render_template,
+    redirect,
+    request,
+    session,
+    url_for,
+)
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from database.db import get_db, get_user_by_email, init_db, seed_db
-from database.queries import (delete_expense as delete_expense_row, get_category_breakdown,
-                               get_expense_by_id, get_recent_transactions,
-                               get_summary_stats, get_user_by_id, insert_expense)
+from database.queries import (
+    delete_expense as delete_expense_row,
+    get_category_breakdown,
+    get_expense_by_id,
+    get_recent_transactions,
+    get_summary_stats,
+    get_user_by_id,
+    insert_expense,
+    update_expense,
+)
 
 app = Flask(__name__)
 app.secret_key = "spendly-dev-secret"
 
-EXPENSE_CATEGORIES = ["Food", "Transport", "Bills", "Health", "Entertainment", "Shopping", "Other"]
+EXPENSE_CATEGORIES = [
+    "Food",
+    "Transport",
+    "Bills",
+    "Health",
+    "Entertainment",
+    "Shopping",
+    "Other",
+]
 
 with app.app_context():
     init_db()
@@ -30,6 +54,7 @@ def parse_date(s):
 # Routes                                                              #
 # ------------------------------------------------------------------ #
 
+
 @app.route("/")
 def landing():
     return render_template("landing.html")
@@ -40,9 +65,9 @@ def register():
     if request.method == "GET":
         return render_template("register.html")
 
-    name             = request.form.get("name", "").strip()
-    email            = request.form.get("email", "").strip()
-    password         = request.form.get("password", "")
+    name = request.form.get("name", "").strip()
+    email = request.form.get("email", "").strip()
+    password = request.form.get("password", "")
     confirm_password = request.form.get("confirm_password", "")
 
     if not name:
@@ -50,7 +75,9 @@ def register():
     if not email:
         return render_template("register.html", error="Email is required")
     if len(password) < 8:
-        return render_template("register.html", error="Password must be at least 8 characters")
+        return render_template(
+            "register.html", error="Password must be at least 8 characters"
+        )
     if password != confirm_password:
         return render_template("register.html", error="Passwords do not match")
 
@@ -63,7 +90,9 @@ def register():
         db.commit()
         db.close()
     except sqlite3.IntegrityError:
-        return render_template("register.html", error="An account with that email already exists")
+        return render_template(
+            "register.html", error="An account with that email already exists"
+        )
 
     return redirect(url_for("login"))
 
@@ -73,7 +102,7 @@ def login():
     if request.method == "GET":
         return render_template("login.html")
 
-    email    = request.form.get("email", "").strip()
+    email = request.form.get("email", "").strip()
     password = request.form.get("password", "")
 
     user = get_user_by_email(email)
@@ -98,6 +127,7 @@ def privacy():
 # Placeholder routes — students will implement these                  #
 # ------------------------------------------------------------------ #
 
+
 @app.route("/logout")
 def logout():
     session.clear()
@@ -112,7 +142,7 @@ def profile():
     uid = session["user_id"]
 
     date_from = parse_date(request.args.get("date_from", "").strip())
-    date_to   = parse_date(request.args.get("date_to",   "").strip())
+    date_to = parse_date(request.args.get("date_to", "").strip())
 
     if date_from and date_to and date_from > date_to:
         flash("Start date must be before end date.", "error")
@@ -122,44 +152,59 @@ def profile():
         date_from = date_to = None
 
     df_str = date_from.isoformat() if date_from else None
-    dt_str = date_to.isoformat()   if date_to   else None
+    dt_str = date_to.isoformat() if date_to else None
 
     today = date.today()
     presets = {
         "this_month": {
             "date_from": today.replace(day=1).isoformat(),
-            "date_to":   today.isoformat(),
+            "date_to": today.isoformat(),
         },
         "last_3": {
             "date_from": (today - timedelta(days=90)).isoformat(),
-            "date_to":   today.isoformat(),
+            "date_to": today.isoformat(),
         },
         "last_6": {
             "date_from": (today - timedelta(days=180)).isoformat(),
-            "date_to":   today.isoformat(),
+            "date_to": today.isoformat(),
         },
     }
 
     if not df_str and not dt_str:
         active_preset = "all_time"
-    elif df_str == presets["this_month"]["date_from"] and dt_str == presets["this_month"]["date_to"]:
+    elif (
+        df_str == presets["this_month"]["date_from"]
+        and dt_str == presets["this_month"]["date_to"]
+    ):
         active_preset = "this_month"
-    elif df_str == presets["last_3"]["date_from"] and dt_str == presets["last_3"]["date_to"]:
+    elif (
+        df_str == presets["last_3"]["date_from"]
+        and dt_str == presets["last_3"]["date_to"]
+    ):
         active_preset = "last_3"
-    elif df_str == presets["last_6"]["date_from"] and dt_str == presets["last_6"]["date_to"]:
+    elif (
+        df_str == presets["last_6"]["date_from"]
+        and dt_str == presets["last_6"]["date_to"]
+    ):
         active_preset = "last_6"
     else:
         active_preset = None
 
-    user       = get_user_by_id(uid)
-    stats      = get_summary_stats(uid, date_from=df_str, date_to=dt_str)
-    expenses   = get_recent_transactions(uid, date_from=df_str, date_to=dt_str)
+    user = get_user_by_id(uid)
+    stats = get_summary_stats(uid, date_from=df_str, date_to=dt_str)
+    expenses = get_recent_transactions(uid, date_from=df_str, date_to=dt_str)
     categories = get_category_breakdown(uid, date_from=df_str, date_to=dt_str)
 
     return render_template(
         "profile.html",
-        user=user, stats=stats, expenses=expenses, categories=categories,
-        date_from=df_str, date_to=dt_str, presets=presets, active_preset=active_preset,
+        user=user,
+        stats=stats,
+        expenses=expenses,
+        categories=categories,
+        date_from=df_str,
+        date_to=dt_str,
+        presets=presets,
+        active_preset=active_preset,
     )
 
 
@@ -184,9 +229,9 @@ def add_expense():
             date=date.today().isoformat(),
         )
 
-    amount_raw  = request.form.get("amount", "").strip()
-    category    = request.form.get("category", "").strip()
-    date_raw    = request.form.get("date", "").strip()
+    amount_raw = request.form.get("amount", "").strip()
+    category = request.form.get("category", "").strip()
+    date_raw = request.form.get("date", "").strip()
     description = request.form.get("description", "").strip()
 
     form_values = {
@@ -202,22 +247,96 @@ def add_expense():
     except ValueError:
         amount = None
     if amount is None or amount <= 0:
-        return render_template("expenses_add.html", error="Please enter a valid amount greater than 0.", **form_values)
+        return render_template(
+            "expenses_add.html",
+            error="Please enter a valid amount greater than 0.",
+            **form_values
+        )
 
     if category not in EXPENSE_CATEGORIES:
-        return render_template("expenses_add.html", error="Please select a valid category.", **form_values)
+        return render_template(
+            "expenses_add.html", error="Please select a valid category.", **form_values
+        )
 
     expense_date = parse_date(date_raw)
     if not expense_date:
-        return render_template("expenses_add.html", error="Please enter a valid date.", **form_values)
+        return render_template(
+            "expenses_add.html", error="Please enter a valid date.", **form_values
+        )
 
-    insert_expense(session["user_id"], amount, category, expense_date.isoformat(), description or None)
+    insert_expense(
+        session["user_id"],
+        amount,
+        category,
+        expense_date.isoformat(),
+        description or None,
+    )
     return redirect(url_for("profile"))
 
 
-@app.route("/expenses/<int:id>/edit")
+@app.route("/expenses/<int:id>/edit", methods=["GET", "POST"])
 def edit_expense(id):
-    return "Edit expense — coming in Step 8"
+    if not session.get("user_id"):
+        return redirect(url_for("login"))
+
+    expense = get_expense_by_id(id, session["user_id"])
+    if expense is None:
+        abort(404)
+
+    if request.method == "GET":
+        return render_template(
+            "edit_expense.html",
+            expense=expense,
+            categories=EXPENSE_CATEGORIES,
+        )
+
+    amount_raw = request.form.get("amount", "").strip()
+    category = request.form.get("category", "").strip()
+    date_raw = request.form.get("date", "").strip()
+    description = request.form.get("description", "").strip()
+
+    form_values = {
+        "expense": {
+            **dict(expense),
+            "amount": amount_raw,
+            "category": category,
+            "date": date_raw,
+            "description": description,
+        },
+        "categories": EXPENSE_CATEGORIES,
+    }
+
+    try:
+        amount = float(amount_raw)
+    except ValueError:
+        amount = None
+    if amount is None or amount <= 0:
+        return render_template(
+            "edit_expense.html",
+            error="Please enter a valid amount greater than 0.",
+            **form_values
+        )
+
+    if category not in EXPENSE_CATEGORIES:
+        return render_template(
+            "edit_expense.html", error="Please select a valid category.", **form_values
+        )
+
+    expense_date = parse_date(date_raw)
+    if not expense_date:
+        return render_template(
+            "edit_expense.html", error="Please enter a valid date.", **form_values
+        )
+
+    update_expense(
+        id,
+        session["user_id"],
+        amount,
+        category,
+        expense_date.isoformat(),
+        description or None,
+    )
+    return redirect(url_for("profile"))
 
 
 @app.route("/expenses/<int:id>/delete", methods=["POST"])
@@ -231,7 +350,7 @@ def delete_expense(id):
     delete_expense_row(id, session["user_id"])
 
     date_from = request.form.get("date_from", "").strip()
-    date_to   = request.form.get("date_to", "").strip()
+    date_to = request.form.get("date_to", "").strip()
     if date_from and date_to:
         return redirect(url_for("profile", date_from=date_from, date_to=date_to))
     return redirect(url_for("profile"))
